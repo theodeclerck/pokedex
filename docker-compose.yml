@@ -1,0 +1,22 @@
+version: '3.3'
+services:
+  db:
+    image: mysql
+    environment:
+      - MYSQL_DATABASE=pokedex
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - "3306:3306"
+    volumes:
+      - db:/var/lib/mysql
+  api:
+    build: .
+    volumes:
+      - .:/usr/app
+      - /usr/app/node_modules
+    ports:
+      - "80:8080"
+    depends_on:
+      - db
+volumes:
+  db:
