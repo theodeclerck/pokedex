@@ -1,5 +1,6 @@
 import {DataTypes, Model} from "sequelize"
 import Database from "./Database.js"
+import Pokemon from "./Pokemon.js";
 
 class Trainer extends Model {}
 
@@ -39,5 +40,7 @@ Trainer.init({
     modelName: 'trainers',
     timestamps: false,
 })
+
+Trainer.hasMany(Pokemon)
 
 export default Trainer

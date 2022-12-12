@@ -1,10 +1,18 @@
 import {DataTypes, Model} from "sequelize";
 import Database from "./Database.js";
+import Trainer from "./Trainer.js";
+import TrainerRoles from "./TrainerRoles.js";
 
 class Roles extends Model{}
 
 Roles.init({
     id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    role: {
         type: DataTypes.ENUM({
             values: [ 'trainer_create',
                 'trainer_update',
@@ -15,14 +23,15 @@ Roles.init({
                 'pokemon_delete',
                 'pokemon_get' ]
         }),
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
+        allowNull: false
     },
 },{
     sequelize: Database,
-    modelName: 'Roles',
+    modelName: 'roles',
     timestamps: false,
 })
+
+Roles.belongsToMany(Trainer, {through: TrainerRoles})
+Trainer.belongsToMany(Roles, {through: TrainerRoles})
 
 export default Roles

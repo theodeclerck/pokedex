@@ -28,9 +28,12 @@ trainer_router.post('/create', async (req, res) => {
 })
 
 trainer_router.get('/getTrainers', async (req, res) => {
-    const {
-
-    } = req.body
+    try {
+        const {id} = await Trainer.findAll()
+        return res.status(200).send({id})
+    } catch (error) {
+        return res.status(500).send(error)
+    }
 })
 
 export default trainer_router

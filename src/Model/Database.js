@@ -13,7 +13,6 @@ const Database = new Sequelize(
 
 (async () => {
     try {
-        console.log(config.DATABASE_NAME)
         await Database.authenticate()
         await Database.sync({alter:true})
         console.log('Database is up')

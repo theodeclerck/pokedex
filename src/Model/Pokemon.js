@@ -1,7 +1,7 @@
 import {DataTypes, Model} from "sequelize";
 import Database from "./Database.js";
 
-class Pokemon extends Model{}
+class Pokemon extends Model {}
 
 Pokemon.init({
     id: {
