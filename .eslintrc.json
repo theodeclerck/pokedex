@@ -1,9 +1,10 @@
 {
     "env": {
         "browser": true,
-        "es2021": true
+        "es2021": true,
+        "mocha": true
     },
-    "extends": "eslint:recommended",
+    "extends": "airbnb-base",
     "overrides": [
     ],
     "parserOptions": {
@@ -11,5 +12,6 @@
         "sourceType": "module"
     },
     "rules": {
+        "import/extensions": 0
     }
 }
