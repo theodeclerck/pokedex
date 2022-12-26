@@ -1,0 +1,55 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Node Backend",
+    "version": "1.0.0"
+  },
+  "host": "localhost:8000",
+  "basePath": "/",
+  "schemes": ["http"],
+  "tags": [],
+  "paths": {
+    "/trainer/register": {
+      "post": {
+        "tags": ["Trainer"],
+        "summary": "Creates a new trainer",
+        "operationId": "createTrainer",
+        "parameters": [
+          {
+            "name": "",
+            "in": "body",
+            "schema": {
+              "items": {
+                "properties": {
+                  "firstname": {
+                    "type": "string"
+                  },
+                  "lastname": {
+                    "type": "string"
+                  },
+                  "login": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/trainer/getTrainerInfo/self": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  }
+}
