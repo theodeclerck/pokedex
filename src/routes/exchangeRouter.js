@@ -3,6 +3,7 @@ import Exchange from '../model/Exchange.js';
 import checkAuthorization from '../middleware/checkAuthorization.js';
 import isAdmin from '../middleware/isAdmin.js';
 import Pokemon from '../model/Pokemon.js';
+import Trainer from "../model/Trainer.js";
 
 const exchangeRouter = express.Router();
 
@@ -22,6 +23,8 @@ exchangeRouter.post('/create/self', [checkAuthorization, async (req, res) => {
         receiverPokemonId,
       },
     })).length !== 0) return res.status(400).send('exchange already exist');
+    const receiver = await Trainer.findByPk(receiverId)
+    if (!receiver) return res.status(404).send('trainer not found')
     if (res.locals.requestor.id === receiverId) return res.status(400).send('sender and receiver cannot be the same');
     const senderPokemon = await Pokemon.findByPk(senderPokemonId);
     if (!senderPokemon) return res.status(404).send('pokemon does not exist');

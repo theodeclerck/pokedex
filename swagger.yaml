@@ -1,0 +1,654 @@
+swagger: "2.0"
+info:
+  title: Pokedex backend
+  description: This is a pokedex api with OAuth2 login
+  version: 1.0.0
+  contact:
+    name: Theo Declerck
+    email: theo.dclrck5@gmail.com
+host: localhost:8000
+tags:
+  - name: auth
+    description: OAuth2
+  - name: trainer
+    description: A trainer have a role and pokemons that he can trade with others trainers
+  - name: pokemon
+    description: A pokemon have a trainer and he can be trade
+  - name: exchange
+    description: An exchange contain a status about a trade and the ids of the twos trainers and their pokemons
+schemes:
+  - http
+paths:
+  /authorize:
+    get:
+      tags:
+        - auth
+      parameters:
+        - in: query
+          name: query
+          type: string
+          required: true
+      responses:
+        200:
+          description: ''
+  /oauth/token:
+    post:
+      tags:
+        - auth
+      parameters:
+        - in: query
+          name: query
+          type: string
+          required: true
+        - in: body
+          name: client
+          required: true
+          schema:
+            properties:
+              login:
+                type: string
+                example: leopkmn
+              password:
+                type: string
+                example: cynthia
+      responses:
+        200:
+          description: 'connected'
+        400:
+          description: 'No authorization code provided'
+        401:
+          description: 'Application is not authorized'
+        404:
+          description: 'User not found'
+        500:
+          description: 'Internal Server Error'
+  /trainer/register:
+    post:
+      tags:
+        - trainer
+      summary: Register a new Trainer.
+      parameters:
+        - name: Trainer
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/Trainer'
+      responses:
+        201:
+          description: 'Trainer created'
+        500:
+          description: 'Internal server error'
+  /trainer/getTrainerInfo/self:
+    get:
+      tags:
+        - trainer
+      summary: Returns the current Trainer logged in.
+      security:
+        - bearerAuth: [ ]
+      responses:
+        200:
+          $ref: '#/definitions/Trainer'
+        404:
+          description: 'Trainer not found'
+  /trainer/getTrainerInfo/{trainerId}:
+    get:
+      tags:
+        - trainer
+      summary: Returns a Trainer by ID.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: path
+          name: trainerId
+          required: true
+          type: integer
+      responses:
+        200:
+          $ref: '#/definitions/Trainer'
+        404:
+          description: 'Trainer not found'
+        500:
+          description: 'Internal server error'
+  /trainer/updateLogin/self:
+    patch:
+      tags:
+        - trainer
+      summary: Update the current logged in Trainer login.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: body
+          name: login
+          required: true
+          schema:
+            properties:
+              login:
+                type: string
+      responses:
+        200:
+          $ref: '#/definitions/Trainer'
+        404:
+          description: 'Trainer not found'
+        500:
+          description: 'Internal server error'
+  /trainer/updateLogin/{trainerId}:
+    patch:
+      tags:
+        - trainer
+      summary: Update a Trainer login by ID.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: body
+          name: login
+          required: true
+          schema:
+            properties:
+              login:
+                type: string
+        - in: path
+          name: trainerId
+          type: integer
+          required: true
+      responses:
+        200:
+          $ref: '#/definitions/Trainer'
+        404:
+          description: 'Trainer not found'
+        500:
+          description: 'Internal server error'
+  /trainer/delete/self:
+    delete:
+      tags:
+        - trainer
+      summary: Delete the current logged in Trainer.
+      security:
+        - bearerAuth: [ ]
+      responses:
+        200:
+          description: 'Trainer has been deleted'
+        500:
+          description: 'Internal server error'
+  /trainer/delete/{trainerId}:
+    delete:
+      tags:
+        - trainer
+      summary: Delete the current logged in Trainer.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: body
+          name: id
+          required: true
+          schema:
+            properties:
+              id:
+                type: integer
+        - in: path
+          name: trainerId
+          type: string
+          required: true
+      responses:
+        200:
+          description: 'Trainer has been deleted'
+        500:
+          description: 'Internal server error'
+  /pokemon/add/self:
+    post:
+      tags:
+        - pokemon
+      summary: Add a Pokemon to the current logged in Trainer.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: body
+          name: Pokemon
+          required: true
+          schema:
+            $ref: '#/definitions/Pokemon'
+      responses:
+        200:
+          description: 'Pokemon Added'
+        404:
+          description: 'Trainer not found'
+        500:
+          description: 'Internal server error'
+  /pokemon/add/{trainerId}:
+    post:
+      tags:
+        - pokemon
+      summary: Add a Pokemon to a Trainer by ID.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: body
+          name: Pokemon
+          required: true
+          schema:
+            $ref: '#/definitions/Pokemon'
+        - in: path
+          name: trainerId
+          required: true
+          type: integer
+      responses:
+        200:
+          description: 'Pokemon Added'
+        404:
+          description: 'Trainer not found'
+        500:
+          description: 'Internal server error'
+  /pokemon/getPokemons/self:
+    get:
+      tags:
+        - pokemon
+      summary: Returns all Pokemons from the current logged in Trainer.
+      security:
+        - bearerAuth: [ ]
+      responses:
+        200:
+          $ref: '#/definitions/Pokemon'
+        500:
+          description: 'Internal server error'
+  /pokemon/getPokemons/{id}:
+    get:
+      tags:
+        - pokemon
+      summary: Returns all Pokemons from a Trainer by ID.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: integer
+      responses:
+        200:
+          $ref: '#/definitions/Pokemon'
+        500:
+          description: 'Internal server error'
+  /pokemon/release/self:
+    delete:
+      tags:
+        - pokemon
+      summary: Delete a Pokemon from the current logged in Trainer.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: body
+          name: id
+          required: true
+          schema:
+            properties:
+              id:
+                type: integer
+      responses:
+        200:
+          description: 'Pokemon released'
+        404:
+          description: 'Pokemon not found'
+        400:
+          description: 'This is not your pokemon'
+        500:
+          description: 'Internal server error'
+  /pokemon/release/{trainerId}:
+    delete:
+      tags:
+        - pokemon
+      summary: Delete a Pokemon from a Trainer by ID.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: body
+          name: id
+          required: true
+          schema:
+            properties:
+              id:
+                type: integer
+        - in: path
+          name: trainerId
+          required: true
+          type: integer
+      responses:
+        200:
+          description: 'Pokemon released'
+        404:
+          description: 'Pokemon not found'
+        400:
+          description: 'The trainer does not own this pokemon'
+        500:
+          description: 'Internal server error'
+  /pokemon/rename/self:
+    patch:
+      tags:
+        - pokemon
+      summary: Update a Pokemon name from the current logged in Trainer.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: body
+          name: name
+          required: true
+          schema:
+            properties:
+              name:
+                type: string
+      responses:
+        200:
+          $ref: '#/definitions/Pokemon'
+        404:
+          description: 'Pokemon not found'
+        400:
+          description: 'The trainer does not own this pokemon'
+        500:
+          description: 'Internal server error'
+  /pokemon/rename/{trainerId}:
+    patch:
+      tags:
+        - pokemon
+      summary: Update a Pokemon name from a Trainer by ID.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: body
+          name: name
+          required: true
+          schema:
+            properties:
+              name:
+                type: string
+        - in: path
+          name: trainerId
+          required: true
+          type: integer
+      responses:
+        200:
+          $ref: '#/definitions/Pokemon'
+        404:
+          description: 'Pokemon not found'
+        400:
+          description: 'The trainer does not own this pokemon'
+        500:
+          description: 'Internal server error'
+  /pokemon/levelUp/{trainerId}:
+    patch:
+      tags:
+        - pokemon
+      summary: Update a Pokemon name from a Trainer by ID.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: body
+          name: level
+          required: true
+          schema:
+            properties:
+              level:
+                type: integer
+        - in: path
+          name: trainerId
+          required: true
+          type: integer
+      responses:
+        200:
+          $ref: '#/definitions/Pokemon'
+        404:
+          description: 'Pokemon not found'
+        400:
+          description: 'The trainer does not own this pokemon'
+        500:
+          description: 'Internal server error'
+  /exchange/create/self:
+    post:
+      tags:
+        - exchange
+      summary: Create an Exchange by 2 Trainer ID and 2 Pokemon ID.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: body
+          name: Exchange
+          required: true
+          schema:
+            properties:
+              receiverId:
+                type: integer
+              senderPokemonId:
+                type: integer
+              receiverPokemonId:
+                type: integer
+      responses:
+        201:
+          description: 'Exchange created'
+        400:
+          description: 'Exchange already exist'
+        404:
+          description: 'Pokemon not found'
+        500:
+          description: 'Internal server error'
+  /exchange/create/{trainerId}:
+    post:
+      tags:
+        - exchange
+      summary: Create an Exchange by 2 Trainer ID and 2 Pokemon ID.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: body
+          name: Exchange
+          required: true
+          schema:
+            properties:
+              receiverId:
+                type: integer
+              senderPokemonId:
+                type: integer
+              receiverPokemonId:
+                type: integer
+        - in: path
+          name: trainerId
+          required: true
+          type: integer
+      responses:
+        201:
+          description: 'Exchange created'
+        400:
+          description: 'Exchange already exist'
+        404:
+          description: 'Pokemon not found'
+        500:
+          description: 'Internal server error'
+  /exchange/getSentExchanges/self:
+    get:
+      tags:
+        - exchange
+      summary: Returns all Exchange sent by the current logged in Trainer.
+      security:
+        - bearerAuth: [ ]
+      responses:
+        200:
+          $ref: '#/definitions/Exchange'
+        500:
+          description: 'Internal server error'
+  /exchange/getSentExchanges/{trainerId}:
+    get:
+      tags:
+        - exchange
+      summary: Returns all Exchange sent by ID.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: path
+          name: trainerId
+          required: true
+          type: integer
+      responses:
+        200:
+          $ref: '#/definitions/Exchange'
+        500:
+          description: 'Internal server error'
+  /exchange/getReceivedExchanges/self:
+    get:
+      tags:
+        - exchange
+      summary: Returns all Exchange received by the current logged in Trainer.
+      security:
+        - bearerAuth: [ ]
+      responses:
+        200:
+          $ref: '#/definitions/Exchange'
+        500:
+          description: 'Internal server error'
+  /exchange/getReceivedExchanges/{trainerId}:
+    get:
+      tags:
+        - exchange
+      summary: Returns all Exchange received by ID.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: path
+          name: trainerId
+          required: true
+          type: integer
+      responses:
+        200:
+          $ref: '#/definitions/Exchange'
+        500:
+          description: 'Internal server error'
+  /exchange/sendResponse:
+    patch:
+      tags:
+        - exchange
+      summary: Update the status of an Exchange by ID.
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - in: body
+          name: Status
+          required: true
+          schema:
+            properties:
+              status:
+                properties:
+                  accepted:
+                    type: string
+                  refused:
+                    type: string
+              id:
+                type: integer
+      responses:
+        200:
+          $ref: '#/definitions/Exchange'
+        400:
+          description: 'Exchange is no more available'
+        404:
+          description: 'Exchange not found'
+        500:
+          description: 'Internal server error'
+definitions:
+  Trainer:
+    properties:
+      id:
+        type: integer
+      firstname:
+        type: string
+        example: valou
+      lastname:
+        type: string
+        example: depat
+      login:
+        type: string
+        example: ladep
+      age:
+        type: string
+        example: '1999-10-10'
+  Pokemon:
+    properties:
+      id:
+        type: integer
+      species:
+        type: string
+        example: carapuce
+      name:
+        type: string
+        example: karapute
+      level:
+        type: integer
+        example: 5
+      gender:
+        properties:
+          male:
+            type: string
+          female:
+            type: string
+          undefined:
+            type: string
+        example: male
+      size:
+        type: integer
+        example: 35
+      weight:
+        type: integer
+        example: 6
+      isShiny:
+        type: boolean
+        example: true
+      trainerId:
+        type: integer
+        example: 1
+  Roles:
+    properties:
+      id:
+        type: integer
+      role:
+        type: string
+  TrainerRoles:
+    properties:
+      id:
+        type: integer
+      trainerId:
+        type: integer
+      roleId:
+        type: integer
+  Exchange:
+    properties:
+      id:
+        type: integer
+      status:
+        properties:
+          waiting:
+            type: string
+          accepted:
+            type: string
+          refused:
+            type: string
+      senderId:
+        type: integer
+      receiverId:
+        type: integer
+      senderPokemonId:
+        type: integer
+      receiverPokemonId:
+        type: integer
+  Client:
+    properties:
+      id:
+        type: string
+        example: client1
+      secret:
+        type: string
+        example: test
+  ClientCode:
+    properties:
+      id:
+        type: integer
+      authorization_code:
+        type: string
+      clientId:
+        type: string
+securityDefinitions:
+  bearerAuth:
+    type: apiKey
+    name: Token
+    in: header

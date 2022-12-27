@@ -35,7 +35,7 @@ trainerRouter.post('/register', async (req, res) => {
       trainerId: id,
     });
 
-    return res.status(200).send({ id });
+    return res.status(201).send({ id });
   } catch (error) {
     return res.status(500).send(error);
   }
@@ -44,6 +44,7 @@ trainerRouter.post('/register', async (req, res) => {
 trainerRouter.get('/getTrainerInfo/self', [checkAuthorization, async (req, res) => {
   try {
     const trainer = await Trainer.findByPk(res.locals.requestor.id);
+    if(!trainer) return res.status(404).send('trainer not found');
     return res.status(200).send(trainer);
   } catch (error) {
     return res.status(500).send(error);
@@ -55,6 +56,7 @@ trainerRouter.get('/getTrainerInfo/:trainerId', [checkAuthorization, async (req,
 
   try {
     const trainer = await Trainer.findByPk(trainerId);
+    if(!trainer) return res.status(404).send('trainer not found');
     return res.status(200).send(trainer);
   } catch (error) {
     return res.status(500).send(error);
