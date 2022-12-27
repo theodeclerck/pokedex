@@ -52,8 +52,10 @@ Trainer.init({
 
   // create the first trainer Leo and set him as admin
   try {
-    if ((await Trainer.findAll()).length === 0) {
-      const encryptedPassword = bcrypt.hashSync('synthia', 5);
+    const leo = await Trainer.findOne({where:{login:'leopkmn'}})
+    if (leo.login === 'leopkmn') return
+    if (!leo) {
+      const encryptedPassword = bcrypt.hashSync('cynthia', 5);
 
       const trainer = await Trainer.create({
         firstname: 'Leo',
